@@ -1,44 +1,54 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- */
 
-import { NewAppScreen } from '@react-native/new-app-screen';
-import { StatusBar, StyleSheet, useColorScheme, View } from 'react-native';
-import {
-  SafeAreaProvider,
-  useSafeAreaInsets,
-} from 'react-native-safe-area-context';
+import React, { useState } from 'react';
+import { SafeAreaView, StyleSheet, StatusBar } from 'react-native';
+import HomeScreen from './src/HomeScreen';
+import GameScreen from './src/GameScreen';
+import MemoriesScreen from './src/MemoriesScreen';
+import HeartFormationScreen from './src/HeartFormationScreen';
 
-function App() {
-  const isDarkMode = useColorScheme() === 'dark';
+// This type helps us manage the steps in our surprise sequence
+type Step = 'home' | 'game' | 'memories' | 'heart';
+
+const App = () => {
+  const [currentStep, setCurrentStep] = useState<Step>('home');
+
+  // Function to advance to the next step in the sequence
+  const advanceTo = (step: Step) => {
+    setCurrentStep(step);
+  };
+
+  // This function decides which screen to show based on the current step
+  const renderCurrentStep = () => {
+    switch (currentStep) {
+      case 'home':
+        return <HomeScreen onStartPress={() => advanceTo('game')} />;
+      
+      case 'game':
+        return <GameScreen onGameWin={() => advanceTo('memories')} />;
+
+      case 'memories':
+        return <MemoriesScreen onContinue={() => advanceTo('heart')} />;
+
+      case 'heart':
+        return <HeartFormationScreen onPlayAgain={() => advanceTo('home')} />;
+
+      default:
+        return <HomeScreen onStartPress={() => advanceTo('game')} />;
+    }
+  };
 
   return (
-    <SafeAreaProvider>
-      <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
-      <AppContent />
-    </SafeAreaProvider>
+    <SafeAreaView style={styles.container}>
+      <StatusBar barStyle="light-content" />
+      {renderCurrentStep()}
+    </SafeAreaView>
   );
-}
-
-function AppContent() {
-  const safeAreaInsets = useSafeAreaInsets();
-
-  return (
-    <View style={styles.container}>
-      <NewAppScreen
-        templateFileName="App.tsx"
-        safeAreaInsets={safeAreaInsets}
-      />
-    </View>
-  );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#1a1a2e',
   },
 });
 
